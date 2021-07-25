@@ -18,6 +18,7 @@ export const FIELD: Record<string, FieldTypes> = {
 export interface FieldType {
   type: FieldTypes;
   exposed: boolean;
+  flagged?: boolean;
 
   adjacent: number;
 }

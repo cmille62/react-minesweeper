@@ -19,7 +19,7 @@ export class TimerStore {
     });
 
     if (!this.paused) {
-      setTimeout(this.callback, 1000);
+      setTimeout(() => this.callback(), 1000);
     }
   }
 
@@ -38,6 +38,6 @@ export class TimerStore {
 
   public resume(): void {
     this.paused = false;
-    setTimeout(this.callback, 1000);
+    setTimeout(() => this.callback(), 1000);
   }
 }

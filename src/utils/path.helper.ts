@@ -13,7 +13,7 @@ function traverse(state: GameState, x: number, y: number): void {
   const uid = UID.generate(x, y);
   const config = state.getComponent(uid);
 
-  if (!config || config.exposed) {
+  if (!config || config.exposed || config.flagged) {
     return;
   }
 

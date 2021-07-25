@@ -24,6 +24,8 @@ export class BoardStore {
       uid: observable,
 
       initialize: action,
+      win: action,
+      fail: action,
     });
   }
 
@@ -40,5 +42,17 @@ export class BoardStore {
     if (uid) {
       this.uid = uid;
     }
+  }
+
+  public win(): void {
+    this.status = GAME_STATUS.Win;
+  }
+
+  public reset(): void {
+    this.status = GAME_STATUS.Good;
+  }
+
+  public fail(): void {
+    this.status = GAME_STATUS.Failure;
   }
 }

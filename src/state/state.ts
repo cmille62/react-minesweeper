@@ -34,9 +34,14 @@ export class GameState {
             }
             break;
           }
+          case actions.FLAG_FIELD: {
+            for (const uid in action.payload) {
+              draftState[uid].flagged = !draftState[uid].flagged;
+            }
+            break;
+          }
           case actions.SHOW_FIELD: {
             for (const uid in action.payload) {
-              console.log("Clicked on: ", uid);
               draftState[uid].exposed = true;
             }
             break;
@@ -123,9 +128,8 @@ export class GameState {
     const state = this.store.getValue();
     const payload = produce(state, (draftState) => {
       for (const component in draftState) {
-        if (draftState[component].exposed) {
-          draftState[component].exposed = false;
-        }
+        draftState[component].exposed = false;
+        draftState[component].flagged = false;
       }
     });
     this.events.next({ type: actions.SET_FIELD, payload });
