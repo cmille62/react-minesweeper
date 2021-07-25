@@ -82,6 +82,10 @@ export class GameState {
     return result;
   }
 
+  getAll(): BoardStoreType {
+    return this.store.getValue();
+  }
+
   /**
    * Returns an field based on the unique id
    * @param uids ids of the form component
@@ -90,7 +94,7 @@ export class GameState {
   getComponent(uid: string): FieldType {
     const state = this.store.getValue();
     const result = produce(state, (draftState) => {
-      return { uid: draftState[uid] };
+      return { [uid]: draftState[uid] };
     });
     return result[uid];
   }

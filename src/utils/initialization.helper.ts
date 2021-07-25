@@ -11,11 +11,36 @@ function generateRemaining(
 }
 
 /**
- * Todo: Improve this, doesn't factor in mines, and doesn't distribute like I want
+ * Generate a board, including mines, and proximity
  * @param param0
  * @returns
  */
-function generateBoard({
+function generateBoard(props: BoardParsedType): BoardPayload {
+  const payload: BoardPayload = populate(props);
+  const { height, width } = props;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const id = UID.generate(x, y);
+      if (!payload[id]) {
+        payload[id] = {
+          type: FIELD.Default,
+          exposed: false,
+          adjacent: around(payload, x, y),
+        };
+      }
+    }
+  }
+
+  return payload;
+}
+
+/**
+ * Generate n mines within the (0,0) - (width,height) plane
+ * @param param0
+ * @returns Board Payload
+ */
+function populate({
   uid,
   width,
   height,
@@ -24,35 +49,50 @@ function generateBoard({
   const rand = seed(uid);
   const payload: BoardPayload = {};
 
-  let tot = 0;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const id = UID.generate(x, y);
-      const is = randn_bm(rand);
-      if (is > 0.6) {
-        tot++;
-      }
-      payload[id] = {
-        type: is > 0.5 ? FIELD.Mine : FIELD.Default,
-        exposed: false,
-        adjacent: 0,
-      };
+  for (let index = 0; index < mines; ) {
+    const x = Math.floor(rand() * width);
+    const y = Math.floor(rand() * height);
+    const id = UID.generate(x, y);
+
+    if (payload[id]) {
+      continue;
+    } else {
+      payload[id] = { type: FIELD.Mine, exposed: false, adjacent: 0 };
+      index++;
     }
   }
-  console.log(tot);
 
   return payload;
 }
 
-function randn_bm(rand: any): any {
-  let u = 0,
-    v = 0;
-  while (u === 0) u = rand(); //Converting [0,1) to (0,1)
-  while (v === 0) v = rand();
-  let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-  num = num / 10.0 + 0.5; // Translate to 0 -> 1
-  if (num > 1 || num < 0) return randn_bm(rand); // resample between 0 and 1
-  return num;
+/**
+ * Count the mines next to each empty field
+ * @param payload
+ * @param x X-Coordinate of field
+ * @param y Y-Coordinate of field
+ * @returns Board Payload
+ */
+function around(payload: BoardPayload, x: number, y: number): number {
+  let result = 0;
+  const xCoords = [x - 1, x, x + 1];
+  const yCoords = [y - 1, y, y + 1];
+
+  xCoords.forEach((xx) => {
+    if (xx > -1) {
+      yCoords.forEach((yy) => {
+        if (yy > -1) {
+          const id = UID.generate(xx, yy);
+          const config = payload[id];
+
+          if (config?.type === FIELD.Mine) {
+            result += 1;
+          }
+        }
+      });
+    }
+  });
+
+  return result;
 }
 
 export const helper = {

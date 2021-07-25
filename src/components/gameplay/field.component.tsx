@@ -2,14 +2,21 @@ import React, { FunctionComponent } from "react";
 import { IconButton, Pane, Heading, VirusIcon, BlankIcon } from "evergreen-ui";
 import { FIELD, FieldType } from "../../types";
 import { useRootStore } from "../../stores";
-import { EventHelper } from "../../utils";
+import { EventHelper, PathHelper } from "../../utils";
 import { withType } from "../../state";
 
 interface Props extends FieldType {
   uid: string;
+  x: number;
+  y: number;
 }
 
-const FieldComponent: FunctionComponent<Props> = ({ uid, ...field }: Props) => {
+const FieldComponent: FunctionComponent<Props> = ({
+  uid,
+  x,
+  y,
+  ...field
+}: Props) => {
   const { exposed, adjacent, type } = field;
   const { boardStore, gameStore } = useRootStore();
 
@@ -19,6 +26,9 @@ const FieldComponent: FunctionComponent<Props> = ({ uid, ...field }: Props) => {
       height={boardStore.size}
       background="tint2"
       border="muted"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
     >
       {exposed ? (
         type === FIELD.Mine ? (
@@ -30,7 +40,8 @@ const FieldComponent: FunctionComponent<Props> = ({ uid, ...field }: Props) => {
         <IconButton
           icon={BlankIcon}
           onClick={() => {
-            EventHelper.expose(gameStore, uid, field);
+            // EventHelper.expose(gameStore, uid, field);
+            PathHelper.traverse(gameStore.state, x, y);
           }}
         />
       )}
