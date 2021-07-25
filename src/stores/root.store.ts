@@ -7,6 +7,7 @@ interface Stores {
   routerStore: stores.RouterStore;
   boardStore: stores.BoardStore;
   gameStore: stores.GameStore;
+  timerStore: stores.TimerStore;
   userStore: stores.UserStore;
 }
 
@@ -19,6 +20,7 @@ export class RootStore {
 
   public boardStore: stores.BoardStore;
   public gameStore: stores.GameStore;
+  public timerStore: stores.TimerStore;
   public userStore: stores.UserStore;
 
   public constructor() {
@@ -29,6 +31,7 @@ export class RootStore {
 
     this.boardStore = new stores.BoardStore();
     this.gameStore = new stores.GameStore();
+    this.timerStore = new stores.TimerStore();
     this.userStore = new stores.UserStore();
   }
 
@@ -37,6 +40,7 @@ export class RootStore {
       routerStore: this.routerStore,
       boardStore: this.boardStore,
       gameStore: this.gameStore,
+      timerStore: this.timerStore,
       userStore: this.userStore,
     };
   }
