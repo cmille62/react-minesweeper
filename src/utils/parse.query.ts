@@ -1,7 +1,8 @@
+import { nanoid } from "nanoid";
 import { BoardParsedType, BoardQueryType } from "../types";
 
 export function parseBoardQuery({
-  uid,
+  uid = nanoid(),
   ...props
 }: BoardQueryType): BoardParsedType {
   const width = parseInt(props.width, 10);

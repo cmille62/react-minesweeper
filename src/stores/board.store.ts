@@ -10,12 +10,16 @@ export class BoardStore {
   public status = GAME_STATUS.Good;
   public uid = nanoid();
 
+  public size = environment.DEFAULT_BOARD_SIZE;
+
   constructor() {
     makeObservable(this, {
       width: observable,
       height: observable,
       mines: observable,
       status: observable,
+
+      size: observable,
 
       uid: observable,
 

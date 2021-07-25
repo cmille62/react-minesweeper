@@ -13,7 +13,7 @@ const icon = {
 export const GameHead: FunctionComponent = observer(() => {
   const { boardStore, timerStore } = useRootStore();
   return (
-    <CenterPane>
+    <CenterPane justifyContent="space-between">
       <Counter count={99} />
       <IconButton appearance="minimal" icon={icon[boardStore.status]} />
       <Counter count={timerStore.seconds} />
