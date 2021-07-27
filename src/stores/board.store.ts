@@ -1,5 +1,5 @@
-import { observable, action, makeObservable } from "mobx";
-import { BoardParsedType, GAME_STATUS } from "../types";
+import { observable, makeObservable } from "mobx";
+import { BoardParsedType } from "../types";
 import { nanoid } from "nanoid";
 import { environment } from "../utils";
 
@@ -7,7 +7,6 @@ export class BoardStore {
   public width = environment.DEFAULT_BOARD_WIDTH;
   public height = environment.DEFAULT_BOARD_HEIGHT;
   public mines = 10;
-  public status = GAME_STATUS.Good;
   public uid = nanoid();
 
   public size = environment.DEFAULT_BOARD_SIZE;
@@ -17,15 +16,10 @@ export class BoardStore {
       width: observable,
       height: observable,
       mines: observable,
-      status: observable,
 
       size: observable,
 
       uid: observable,
-
-      initialize: action,
-      win: action,
-      fail: action,
     });
   }
 
@@ -37,22 +31,9 @@ export class BoardStore {
     this.width = width;
     this.height = height;
     this.mines = mines;
-    this.status = GAME_STATUS.Good;
 
     if (uid) {
       this.uid = uid;
     }
-  }
-
-  public win(): void {
-    this.status = GAME_STATUS.Win;
-  }
-
-  public reset(): void {
-    this.status = GAME_STATUS.Good;
-  }
-
-  public fail(): void {
-    this.status = GAME_STATUS.Failure;
   }
 }

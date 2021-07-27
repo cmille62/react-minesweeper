@@ -5,4 +5,7 @@ export const actions = {
   SET_FIELD: "setField",
   FLAG_FIELD: "flagField",
   SHOW_FIELD: "showField",
+
+  UPDATE_REMAINING: "updateRemaining",
+  UPDATE_STATUS: "updateStatus",
 };

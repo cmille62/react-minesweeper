@@ -10,6 +10,10 @@ function generateRemaining(
   return width * height - mines;
 }
 
+function countEmpty({ width, height, mines }: BoardParsedType) {
+  return width * height - mines;
+}
+
 /**
  * Generate a board, including mines, and proximity
  * @param param0
@@ -98,4 +102,5 @@ function around(payload: BoardPayload, x: number, y: number): number {
 export const helper = {
   generateRemaining,
   generateBoard,
+  countEmpty,
 };

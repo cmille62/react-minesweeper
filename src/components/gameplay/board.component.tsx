@@ -7,7 +7,13 @@ import { BoardRow } from "./row.component";
 export const Board: FunctionComponent = observer(() => {
   const { boardStore } = useRootStore();
   return (
-    <Pane background="tint1" display="inline-flex" flexDirection="column">
+    <Pane
+      background="tint1"
+      display="inline-flex"
+      flexDirection="column"
+      alignItems="center"
+      padding={16}
+    >
       {[...Array(boardStore.width)].map((_, y) => (
         <BoardRow key={`board-${y}`} y={y} />
       ))}

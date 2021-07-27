@@ -7,10 +7,10 @@ import {
   BlankIcon,
   RigIcon,
 } from "evergreen-ui";
-import { FIELD, FieldType } from "../../types";
+import { FIELD, FieldType, GAME_STATUS } from "../../types";
 import { useRootStore } from "../../stores";
 import { EventHelper, PathHelper } from "../../utils";
-import { withType } from "../../state";
+import { actions, withType } from "../../state";
 
 interface Props extends FieldType {
   uid: string;
@@ -79,7 +79,10 @@ const FieldComponent: FunctionComponent<Props> = ({
             } else {
               PathHelper.traverse(gameStore.state, x, y);
               if (mine) {
-                boardStore.fail();
+                gameStore.events.next({
+                  type: actions.UPDATE_STATUS,
+                  payload: GAME_STATUS.Failure,
+                });
               }
             }
           }}

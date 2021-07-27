@@ -11,4 +11,4 @@ export interface BoardEvent<T> {
 
 export type BoardPayload = BoardStoreType;
 
-export type BoardAction = BoardEvent<BoardPayload>;
+export type BoardAction = BoardEvent<BoardPayload | number | string>;

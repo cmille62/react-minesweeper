@@ -24,27 +24,25 @@ export class GameState {
   store: BehaviorSubject<BoardStoreType>;
   subs: { [x: string]: Subscription } = {};
 
-  status: GameStatus;
   timer: Observable<number>;
 
-  remaining: Subject<number>;
-  remain: number;
+  status: GameStatus = GAME_STATUS.Initial;
+  remaining = 0;
+  toWin = 0;
+
+  initial = 0;
 
   constructor(events: Subject<BoardAction>) {
     this.events = events;
     this.store = new BehaviorSubject<BoardStoreType>({});
-    this.status = GAME_STATUS.Initial;
     this.timer = interval(1000);
-    this.remaining = new Subject<number>();
-    this.remain = 0;
+
     this.reducer();
   }
 
   reducer(): void {
-    this.subs.remain = this.remaining.subscribe((value: number) => {
-      this.remain = value;
-    });
     this.subs.events = this.events.subscribe((action: BoardAction) => {
+      const payload = action.payload as BoardPayload;
       const state = this.store.getValue();
       const nextState = produce(state, (draftState) => {
         if (this.status === GAME_STATUS.Initial) {
@@ -52,28 +50,47 @@ export class GameState {
           this.timer = interval(1000);
         }
         switch (action.type) {
+          case actions.UPDATE_REMAINING: {
+            this.remaining = action.payload as number;
+            break;
+          }
+          case actions.UPDATE_STATUS: {
+            this.status = action.payload as GameStatus;
+            break;
+          }
           case actions.SET_FIELD: {
-            for (const uid in action.payload) {
-              draftState[uid] = action.payload[uid];
+            for (const uid in payload) {
+              draftState[uid] = payload[uid];
             }
             break;
           }
           case actions.FLAG_FIELD: {
-            for (const uid in action.payload) {
+            for (const uid in payload) {
               draftState[uid].flagged = !draftState[uid].flagged;
+              let remaining = this.remaining;
               if (draftState[uid].flagged) {
-                this.remaining.next(this.remain - 1);
+                remaining--;
               } else {
-                this.remaining.next(this.remain + 1);
+                remaining++;
               }
+              this.events.next({
+                type: actions.UPDATE_REMAINING,
+                payload: remaining,
+              });
             }
             break;
           }
-          // case action.MINE_HIT: {
-          // }
           case actions.SHOW_FIELD: {
-            for (const uid in action.payload) {
+            for (const uid in payload) {
               draftState[uid].exposed = true;
+              this.toWin--;
+
+              if (!this.toWin) {
+                this.events.next({
+                  type: actions.UPDATE_STATUS,
+                  payload: GAME_STATUS.Win,
+                });
+              }
             }
             break;
           }
@@ -90,9 +107,16 @@ export class GameState {
    * Initialize the board with a provided board configuration
    * @param config board configuration
    */
-  initialize(payload: BoardPayload, mines: number): void {
+  initialize(payload: BoardPayload, mines: number, total: number): void {
     this.events.next({ type: actions.SET_FIELD, payload });
-    this.remaining.next(mines);
+
+    this.events.next({
+      type: actions.UPDATE_REMAINING,
+      payload: mines,
+    });
+
+    this.toWin = total;
+    this.initial = total;
   }
 
   /**
@@ -157,6 +181,7 @@ export class GameState {
    * Reset the current board
    */
   reset(): void {
+    this.toWin = this.initial;
     const state = this.store.getValue();
     const payload = produce(state, (draftState) => {
       for (const component in draftState) {
@@ -165,6 +190,10 @@ export class GameState {
       }
     });
     this.events.next({ type: actions.SET_FIELD, payload });
+    this.events.next({
+      type: actions.UPDATE_STATUS,
+      payload: GAME_STATUS.Good,
+    });
   }
 
   /**

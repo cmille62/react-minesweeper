@@ -9,6 +9,8 @@ import {
 import { useRootStore } from "../../stores";
 import { CenterPane, Counter } from "../../common";
 import { observer } from "mobx-react";
+import { actions } from "../../state";
+import { GameStatus } from "../../types";
 
 const icon = {
   initial: EmojiIcon,
@@ -19,15 +21,25 @@ const icon = {
 };
 
 export const GameHead: FunctionComponent = observer(() => {
-  const { boardStore, gameStore } = useRootStore();
+  const { gameStore } = useRootStore();
   const [seconds, setSeconds] = useState(0);
   const [remain, setRemaining] = useState(0);
+  const [status, setStatus] = useState<GameStatus>();
 
   useEffect(() => {
     const sub = gameStore.state.timer.subscribe((value) => setSeconds(value));
-    const sub2 = gameStore.state.remaining.subscribe((value) =>
-      setRemaining(value)
-    );
+    const sub2 = gameStore.events.subscribe(({ type, payload }) => {
+      switch (type) {
+        case actions.UPDATE_REMAINING: {
+          setRemaining(payload as number);
+          break;
+        }
+        case actions.UPDATE_STATUS: {
+          setStatus(payload as GameStatus);
+          break;
+        }
+      }
+    });
 
     return () => {
       sub.unsubscribe();
@@ -40,10 +52,9 @@ export const GameHead: FunctionComponent = observer(() => {
       <Counter count={remain} />
       <IconButton
         appearance="minimal"
-        icon={icon[gameStore.state.status]}
+        icon={status ? icon[status] : icon.initial}
         onClick={() => {
           gameStore.state.reset();
-          boardStore.reset();
         }}
       />
       <Counter count={seconds} />
