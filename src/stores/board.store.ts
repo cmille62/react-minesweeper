@@ -4,9 +4,9 @@ import { nanoid } from "nanoid";
 import { environment } from "../utils";
 
 export class BoardStore {
-  public width = environment.DEFAULT_BOARD_WIDTH;
-  public height = environment.DEFAULT_BOARD_HEIGHT;
-  public mines = 10;
+  public width!: number;
+  public height!: number;
+  public mines!: number;
   public uid = nanoid();
 
   public size = environment.DEFAULT_BOARD_SIZE;

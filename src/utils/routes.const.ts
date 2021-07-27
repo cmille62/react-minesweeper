@@ -9,14 +9,14 @@ const formatRoute: (path: string) => string = (path) => {
 
 type StructureRouteType = (
   route: RouteType,
-  options: Record<string, string>
+  options: Record<string, string | number>
 ) => string;
 
 export const structureRoute: StructureRouteType = (route, options) => {
   let result = route.path;
 
   Object.keys(options).forEach((key) => {
-    result = result.replace(`:${key}`, options[key]);
+    result = result.replace(`:${key}`, `${options[key]}`);
   });
 
   return result;

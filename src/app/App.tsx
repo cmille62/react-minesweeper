@@ -1,9 +1,16 @@
 import React, { FunctionComponent } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import { HomePage, GameplayPage } from "../components";
-import { Routes } from "../utils";
+import { GameplayPage } from "../components";
+import { Routes, structureRoute } from "../utils";
 
 import "./App.scss";
+
+const url = structureRoute(Routes.Gameplay, {
+  width: 20,
+  height: 20,
+  mines: 25,
+  uid: "",
+});
 
 export const App: FunctionComponent = () => {
   return (
@@ -11,12 +18,11 @@ export const App: FunctionComponent = () => {
       <Route
         exact
         path={Routes.Base.path}
-        render={() => <Redirect to={Routes.BaseRoute.path} />}
+        render={() => <Redirect to={url} />}
       />
-      <Route {...Routes.Home} component={HomePage} />
       <Route {...Routes.Gameplay} component={GameplayPage} />
 
-      <Route render={() => <Redirect to={Routes.Home.path} />} />
+      <Route render={() => <Redirect to={url} />} />
     </Switch>
   );
 };

@@ -14,6 +14,8 @@ import { Board } from "./board.component";
 import { GameHead } from "./head.component";
 import { CenterPane, ControlsPane } from "../../common";
 import { nanoid } from "nanoid";
+import { Difficulty } from "./difficulty.component";
+import { Settings } from "./setings.component";
 
 type Props = RouteComponentProps<BoardQueryType>;
 
@@ -40,15 +42,20 @@ export const GameplayPage: FunctionComponent<Props> = (props: Props) => {
       >
         <GameHead />
         <Board />
-        <ControlsPane>
-          <IconButton
-            icon={RandomIcon}
-            is="a"
-            href={structureRoute(Routes.Gameplay, {
-              ...props.match.params,
-              uid: nanoid(),
-            })}
-          />
+        <ControlsPane marginTop={16}>
+          <Difficulty />
+          <Pane display="flex">
+            <Settings />
+            <IconButton
+              marginLeft={8}
+              icon={RandomIcon}
+              is="a"
+              href={structureRoute(Routes.Gameplay, {
+                ...props.match.params,
+                uid: nanoid(),
+              })}
+            />
+          </Pane>
         </ControlsPane>
       </Pane>
     </CenterPane>
