@@ -96,11 +96,6 @@ export class GameState {
             }
             break;
           }
-          case actions.RESET_BOARD: {
-            this.timer.stop();
-            this.timer.seconds = 0;
-            this.reset();
-          }
         }
       });
       this.store.next(nextState);
@@ -187,6 +182,7 @@ export class GameState {
    */
   reset(): void {
     this.toWin = this.initial;
+    this.timer.reset();
     const state = this.store.getValue();
     const payload = produce(state, (draftState) => {
       for (const component in draftState) {
@@ -197,13 +193,13 @@ export class GameState {
     this.events.next({ type: actions.SET_FIELD, payload });
 
     this.events.next({
-      type: actions.UPDATE_STATUS,
-      payload: GAME_STATUS.Initial,
+      type: actions.UPDATE_REMAINING,
+      payload: this.mines,
     });
 
     this.events.next({
-      type: actions.UPDATE_REMAINING,
-      payload: this.mines,
+      type: actions.UPDATE_STATUS,
+      payload: GAME_STATUS.Initial,
     });
   }
 

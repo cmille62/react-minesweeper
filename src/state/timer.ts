@@ -28,6 +28,7 @@ export class Timer {
   }
 
   reset(): void {
+    console.log("reset");
     this.seconds = 0;
     this._stop.next();
   }

@@ -10,7 +10,7 @@ function generateRemaining(
   return width * height - mines;
 }
 
-function countEmpty({ width, height, mines }: BoardParsedType) {
+function countEmpty({ width, height, mines }: BoardParsedType): number {
   return width * height - mines;
 }
 
