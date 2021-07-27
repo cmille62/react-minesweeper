@@ -27,3 +27,5 @@ Then the application will start at localhost:3000
 
 ## Application Information
 This game is constructed utilizing Mobx, RxJS, and React. 
+
+The board is generated utilizing a random seed, which is provided within the url. If you want to share a game, simply share the link! You can provide one or have one generated for you.
