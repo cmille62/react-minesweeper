@@ -17,7 +17,7 @@ export const GameplayPage: FunctionComponent<Props> = (props: Props) => {
   useEffect(() => {
     const p = parseBoardQuery(props.match.params);
     boardStore.initialize(p);
-    gameStore.state.initialize(InitHelper.generateBoard(p));
+    gameStore.state.initialize(InitHelper.generateBoard(p), p.mines);
   }, [props.match]);
 
   return (

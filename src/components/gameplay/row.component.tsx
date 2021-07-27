@@ -11,17 +11,14 @@ interface Props {
 }
 
 export const BoardRow: FunctionComponent<Props> = observer(({ y }: Props) => {
-  const { boardStore, gameStore, timerStore } = useRootStore();
+  const { boardStore, gameStore } = useRootStore();
   const disabled = boardStore.status !== GAME_STATUS.Good;
-  const initial = timerStore.seconds === 0;
   return (
     <Pane display="flex" flexDirection="row" flexShrink={0}>
       {[...Array(boardStore.width)].map((_, x) => {
         const uid = UID.generate(x, y);
         const field = gameStore.state.getComponent(uid);
-        return (
-          <Field key={uid} {...{ ...field, uid, x, y, disabled, initial }} />
-        );
+        return <Field key={uid} {...{ ...field, uid, x, y, disabled }} />;
       })}
     </Pane>
   );

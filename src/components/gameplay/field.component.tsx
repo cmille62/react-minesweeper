@@ -47,11 +47,10 @@ const FieldComponent: FunctionComponent<Props> = ({
   x,
   y,
   disabled,
-  initial,
   ...field
 }: Props) => {
   const { exposed, adjacent, type, flagged } = field;
-  const { boardStore, gameStore, timerStore } = useRootStore();
+  const { boardStore, gameStore } = useRootStore();
   const mine = type === FIELD.Mine;
 
   return (
@@ -75,9 +74,6 @@ const FieldComponent: FunctionComponent<Props> = ({
           icon={flagged ? RigIcon : BlankIcon}
           disabled={disabled}
           onClick={() => {
-            if (initial) {
-              timerStore.start();
-            }
             if (flagged) {
               EventHelper.flag(gameStore.state, uid, field);
             } else {

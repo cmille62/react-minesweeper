@@ -1,7 +1,15 @@
-import { BoardAction, BoardPayload, BoardStoreType, FieldType } from "../types";
+import {
+  BoardAction,
+  BoardPayload,
+  BoardStoreType,
+  FieldType,
+  GameStatus,
+  GAME_STATUS,
+} from "../types";
 import {
   BehaviorSubject,
   distinctUntilChanged,
+  interval,
   Observable,
   pluck,
   Subject,
@@ -15,18 +23,34 @@ export class GameState {
   events: Subject<BoardAction>;
   store: BehaviorSubject<BoardStoreType>;
   subs: { [x: string]: Subscription } = {};
-  uid!: string;
+
+  status: GameStatus;
+  timer: Observable<number>;
+
+  remaining: Subject<number>;
+  remain: number;
 
   constructor(events: Subject<BoardAction>) {
     this.events = events;
     this.store = new BehaviorSubject<BoardStoreType>({});
+    this.status = GAME_STATUS.Initial;
+    this.timer = interval(1000);
+    this.remaining = new Subject<number>();
+    this.remain = 0;
     this.reducer();
   }
 
   reducer(): void {
+    this.subs.remain = this.remaining.subscribe((value: number) => {
+      this.remain = value;
+    });
     this.subs.events = this.events.subscribe((action: BoardAction) => {
       const state = this.store.getValue();
       const nextState = produce(state, (draftState) => {
+        if (this.status === GAME_STATUS.Initial) {
+          this.status = GAME_STATUS.Good;
+          this.timer = interval(1000);
+        }
         switch (action.type) {
           case actions.SET_FIELD: {
             for (const uid in action.payload) {
@@ -37,9 +61,16 @@ export class GameState {
           case actions.FLAG_FIELD: {
             for (const uid in action.payload) {
               draftState[uid].flagged = !draftState[uid].flagged;
+              if (draftState[uid].flagged) {
+                this.remaining.next(this.remain - 1);
+              } else {
+                this.remaining.next(this.remain + 1);
+              }
             }
             break;
           }
+          // case action.MINE_HIT: {
+          // }
           case actions.SHOW_FIELD: {
             for (const uid in action.payload) {
               draftState[uid].exposed = true;
@@ -59,8 +90,9 @@ export class GameState {
    * Initialize the board with a provided board configuration
    * @param config board configuration
    */
-  initialize(payload: BoardPayload): void {
+  initialize(payload: BoardPayload, mines: number): void {
     this.events.next({ type: actions.SET_FIELD, payload });
+    this.remaining.next(mines);
   }
 
   /**
