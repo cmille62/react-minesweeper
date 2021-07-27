@@ -1,45 +1,34 @@
-import produce from "immer";
-import { interval, Observable } from "rxjs";
+import { Observable, Subject, timer } from "rxjs";
+import { map, repeatWhen, takeUntil } from "rxjs/operators";
 
 export class Timer {
-  public interval: Observable<number>;
-  private paused = true;
+  readonly observable$: Observable<number>;
+  private readonly _stop = new Subject<void>();
+  private readonly _start = new Subject<void>();
+  public seconds = 0;
 
-  constructor() {
-    this.interval = interval(1000);
+  constructor(delay = 1000) {
+    this._stop.next();
+    this.observable$ = timer(0, delay).pipe(
+      map(() => {
+        this.seconds++;
+        return this.seconds;
+      }),
+      takeUntil(this._stop),
+      repeatWhen(() => this._start)
+    );
   }
 
-  // private callback(): void {
-  //   const state = this.seconds.getValue();
-  //   const nextState = produce(state, (draftState) => {
-  //     draftState += 1;
-  //   });
-  //   this.seconds.next(nextState);
+  start(): void {
+    this._start.next();
+  }
 
-  //   if (!this.paused) {
-  //     setTimeout(() => this.callback(), 1000);
-  //   }
-  // }
+  stop(): void {
+    this._stop.next();
+  }
 
-  // public start(): void {
-  //   this.seconds = 0;
-  //   this.resume();
-  // }
-
-  // public reset(): void {
-  //   const state = this.seconds.getValue();
-  //   const nextState = produce(state, (draftState) => {
-  //     draftState = 0;
-  //   });
-  //   this.seconds.next(nextState);
-  // }
-
-  // public pause(): void {
-  //   this.paused = true;
-  // }
-
-  // public resume(): void {
-  //   this.paused = false;
-  //   setTimeout(() => this.callback(), 1000);
-  // }
+  reset(): void {
+    this.seconds = 0;
+    this._stop.next();
+  }
 }

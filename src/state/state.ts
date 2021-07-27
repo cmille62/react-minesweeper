@@ -9,7 +9,6 @@ import {
 import {
   BehaviorSubject,
   distinctUntilChanged,
-  interval,
   Observable,
   pluck,
   Subject,
@@ -18,24 +17,26 @@ import {
 } from "rxjs";
 import { actions } from "./actions";
 import produce from "immer";
+import { Timer } from "./timer";
 
 export class GameState {
   events: Subject<BoardAction>;
   store: BehaviorSubject<BoardStoreType>;
   subs: { [x: string]: Subscription } = {};
 
-  timer: Observable<number>;
+  timer: Timer;
 
   status: GameStatus = GAME_STATUS.Initial;
   remaining = 0;
   toWin = 0;
 
   initial = 0;
+  mines = 0;
 
   constructor(events: Subject<BoardAction>) {
     this.events = events;
     this.store = new BehaviorSubject<BoardStoreType>({});
-    this.timer = interval(1000);
+    this.timer = new Timer();
 
     this.reducer();
   }
@@ -47,7 +48,7 @@ export class GameState {
       const nextState = produce(state, (draftState) => {
         if (this.status === GAME_STATUS.Initial) {
           this.status = GAME_STATUS.Good;
-          this.timer = interval(1000);
+          this.timer.start();
         }
         switch (action.type) {
           case actions.UPDATE_REMAINING: {
@@ -86,6 +87,7 @@ export class GameState {
               this.toWin--;
 
               if (!this.toWin) {
+                this.timer.stop();
                 this.events.next({
                   type: actions.UPDATE_STATUS,
                   payload: GAME_STATUS.Win,
@@ -95,6 +97,8 @@ export class GameState {
             break;
           }
           case actions.RESET_BOARD: {
+            this.timer.stop();
+            this.timer.seconds = 0;
             this.reset();
           }
         }
@@ -117,6 +121,7 @@ export class GameState {
 
     this.toWin = total;
     this.initial = total;
+    this.mines = mines;
   }
 
   /**
@@ -190,9 +195,15 @@ export class GameState {
       }
     });
     this.events.next({ type: actions.SET_FIELD, payload });
+
     this.events.next({
       type: actions.UPDATE_STATUS,
-      payload: GAME_STATUS.Good,
+      payload: GAME_STATUS.Initial,
+    });
+
+    this.events.next({
+      type: actions.UPDATE_REMAINING,
+      payload: this.mines,
     });
   }
 

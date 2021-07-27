@@ -1,13 +1,19 @@
 import React, { FunctionComponent, useEffect } from "react";
 import { RouteComponentProps } from "react-router-dom";
-import { Pane } from "evergreen-ui";
+import { IconButton, Pane, RandomIcon } from "evergreen-ui";
 import { BoardQueryType } from "../../types";
 import { useRootStore } from "../../stores";
-import { InitHelper, parseBoardQuery } from "../../utils";
+import {
+  InitHelper,
+  parseBoardQuery,
+  Routes,
+  structureRoute,
+} from "../../utils";
 
 import { Board } from "./board.component";
 import { GameHead } from "./head.component";
-import { CenterPane } from "../../common";
+import { CenterPane, ControlsPane } from "../../common";
+import { nanoid } from "nanoid";
 
 type Props = RouteComponentProps<BoardQueryType>;
 
@@ -34,6 +40,16 @@ export const GameplayPage: FunctionComponent<Props> = (props: Props) => {
       >
         <GameHead />
         <Board />
+        <ControlsPane>
+          <IconButton
+            icon={RandomIcon}
+            is="a"
+            href={structureRoute(Routes.Gameplay, {
+              ...props.match.params,
+              uid: nanoid(),
+            })}
+          />
+        </ControlsPane>
       </Pane>
     </CenterPane>
   );

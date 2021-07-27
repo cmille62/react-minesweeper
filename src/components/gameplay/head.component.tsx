@@ -27,7 +27,9 @@ export const GameHead: FunctionComponent = observer(() => {
   const [status, setStatus] = useState<GameStatus>();
 
   useEffect(() => {
-    const sub = gameStore.state.timer.subscribe((value) => setSeconds(value));
+    const sub = gameStore.state.timer.observable$.subscribe((value) =>
+      setSeconds(value)
+    );
     const sub2 = gameStore.events.subscribe(({ type, payload }) => {
       switch (type) {
         case actions.UPDATE_REMAINING: {
@@ -54,6 +56,7 @@ export const GameHead: FunctionComponent = observer(() => {
         appearance="minimal"
         icon={status ? icon[status] : icon.initial}
         onClick={() => {
+          setSeconds(0);
           gameStore.state.reset();
         }}
       />

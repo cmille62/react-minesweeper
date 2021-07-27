@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { useRootStore } from "../../stores";
 import { Field } from "./field.component";
 import { UID } from "../../utils";
-import { GAME_STATUS } from "../../types";
+import { GAME_STATUS, GameStatus } from "../../types";
 import { actions } from "../../state";
 
 interface Props {
@@ -18,7 +18,12 @@ export const BoardRow: FunctionComponent<Props> = observer(({ y }: Props) => {
   useEffect(() => {
     const sub = gameStore.events.subscribe(({ type, payload }) => {
       if (type === actions.UPDATE_STATUS) {
-        setDisabled(payload !== GAME_STATUS.Good);
+        console.log(type);
+        setDisabled(
+          ![GAME_STATUS.Good, GAME_STATUS.Initial].includes(
+            payload as GameStatus
+          )
+        );
       }
     });
 
