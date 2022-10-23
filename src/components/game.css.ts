@@ -1,7 +1,8 @@
 import { style } from "@vanilla-extract/css";
 
-export const styles = style({
-  padding: 10,
-  // display: "flex",
-
-});
+export const styles = {
+  boardWrapper: style({
+    width: "min-content",
+    margin: "0px auto",
+  }),
+};

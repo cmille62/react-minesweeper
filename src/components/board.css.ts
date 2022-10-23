@@ -1,6 +1,13 @@
-import { style } from "@vanilla-extract/css";
+import {  style } from "@vanilla-extract/css";
 
 export const styles = style({
-  margin: "0px auto",
-  border: "1px solid rgb(21,22,21)",
+  padding: 10,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  border: "1px solid #ddd",
+});
+
+export const row = style({
+  display: "flex",
 });

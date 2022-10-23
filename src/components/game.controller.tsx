@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from "react";
+import React, { Fragment, FunctionComponent, useEffect } from "react";
 import { Board, GameStats } from "./index";
 import { onNewCell } from "../stream";
 
@@ -11,16 +11,17 @@ export const Game: FunctionComponent = () => {
 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        console.log(x, y);
         onNewCell({ xCoord: x, yCoord: y });
       }
     }
   }, []);
 
   return (
-    <div className={styles}>
-      <Board />
+    <Fragment>
+      <div className={styles.boardWrapper}>
+        <Board />
+      </div>
       <GameStats />
-    </div>
+    </Fragment>
   );
 };

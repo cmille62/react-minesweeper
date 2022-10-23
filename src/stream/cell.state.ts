@@ -7,21 +7,19 @@ import {
   combineKeys,
   mergeWithKey
 } from "@react-rxjs/utils";
-import { CellState } from "../utils";
+import { CellState, generateCid } from "../utils";
 import { CellType, CidType } from "../types";
 
 
 const [newCell$, onNewCell] = createSignal<{ xCoord: number; yCoord: number}>();
 const [openCell$, onOpenCell] = createSignal<CidType>();
 const [flagCell$, onFlagCell] = createSignal<CidType>();
-const [unflagCell$, onUnFlagCell] = createSignal<CidType>();
 
 
 const cellActions$ = mergeWithKey({
-  add: newCell$.pipe(map(({xCoord, yCoord}) => ({id: `${xCoord}-${yCoord}`, xCoord, yCoord}))),
+  add: newCell$.pipe(map(({xCoord, yCoord}) => ({id: generateCid(xCoord, yCoord), xCoord, yCoord}))),
   open: openCell$.pipe(map((id) => ({ id }))),
   flag: flagCell$.pipe(map((id) => ({ id }))),
-  unflag: unflagCell$.pipe(map((id) => ({ id }))),
 });
 
 const [cellsById, keys$] = partitionByKey(
@@ -31,15 +29,18 @@ const [cellsById, keys$] = partitionByKey(
     event$.pipe(
       scan(
         (state, action) => {
+          console.log(action);
           switch (action.type) {
           case "add":
             return {...state, ...action.payload};
           case "open":
             return {...state, state: CellState.Opened };
           case "flag":
+            if (state.state === CellState.Flagged) {
+              return { ...state, state: CellState.Unopened };
+
+            }
             return { ...state, state: CellState.Flagged };
-          case "unflag":
-            return { ...state, state: CellState.Unopened };
           default:
             return state;
           }
@@ -90,4 +91,4 @@ export const [useGameStats] = bind(
     percentageFlagged: 0, }
 );
 
-export { onFlagCell, onOpenCell, onUnFlagCell, onNewCell };
+export { onFlagCell, onOpenCell, onNewCell };
