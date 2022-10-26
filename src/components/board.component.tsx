@@ -10,8 +10,6 @@ export const Board: FunctionComponent = () => {
   const { width, height } = useBoard();
   const cells = useCells();
 
-  console.log(cells);
-
   return (
     <div className={styles}>
       {range(height).map((y) => (

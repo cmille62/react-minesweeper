@@ -1,4 +1,4 @@
-import { map, scan } from "rxjs/operators";
+import { map, scan, first } from "rxjs/operators";
 import { bind, shareLatest } from "@react-rxjs/core";
 import {
   createSignal,
@@ -6,7 +6,7 @@ import {
   combineKeys,
   mergeWithKey,
 } from "@react-rxjs/utils";
-import { CellState, generateCid } from "../../utils";
+import { CellState, CidUtils, generateCid, GenerateUtils } from "../../utils";
 import { CellType, CidType } from "../../types";
 
 const [newCell$, onNewCell] = createSignal<{
@@ -16,13 +16,7 @@ const [newCell$, onNewCell] = createSignal<{
 }>();
 const [openCell$, onOpenCell] = createSignal<CidType>();
 const [flagCell$, onFlagCell] = createSignal<CidType>();
-const [addMine$, onAddMine] = createSignal<CidType>();
-
-export const counterMines$ = addMine$
-  .pipe(
-    map((clicks) => 1),
-    scan((acc, click) => acc + click)
-  );
+const [count$, onCountNearby] = createSignal<{id: CidType, around: number}>();
 
 const cellActions$ = mergeWithKey({
   add: newCell$.pipe(
@@ -35,6 +29,7 @@ const cellActions$ = mergeWithKey({
   ),
   open: openCell$.pipe(map((id) => ({ id }))),
   flag: flagCell$.pipe(map((id) => ({ id }))),
+  nearby: count$.pipe(map(({ id, around }) => ({ id, around }))),
 });
 
 const [cellsById, keys$] = partitionByKey(
@@ -45,8 +40,6 @@ const [cellsById, keys$] = partitionByKey(
       scan(
         (state, action) => {
           switch (action.type) {
-          case "add":
-            return { ...state, ...action.payload };
           case "open":
             return { ...state, state: CellState.Opened };
           case "flag":
@@ -56,6 +49,9 @@ const [cellsById, keys$] = partitionByKey(
               return { ...state, state: CellState.Flagged };
             }
             return state;
+          case "add":
+          case "nearby":
+            return { ...state, ...action.payload };
           default:
             return state;
           }
@@ -119,4 +115,18 @@ export const [useGameStats] = bind(
   }
 );
 
-export { onFlagCell, onOpenCell, onNewCell, onAddMine };
+export function countNearby() {
+  let once = true;
+  const subscription = cellsList$.pipe(first()).subscribe((cells) => {
+    if(once){
+      for (const cell of cells) {
+        onCountNearby({ id: CidUtils.generate(cell.xCoord, cell.yCoord), around: GenerateUtils.countNearby(cells, cell) });
+      }
+    }
+    once = false;
+  });
+
+  subscription.unsubscribe();
+}
+
+export { onFlagCell, onOpenCell, onNewCell, cellsById };
