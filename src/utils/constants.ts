@@ -4,7 +4,7 @@ export const BoardConst = {
   Width: 10,
   Height: 10,
   Cell: 25,
-  Ratio: 0.5
+  Ratio: 0.3
 };
 
 export const CellState: Record<string, CellStateType> = {

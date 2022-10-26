@@ -1,13 +1,13 @@
 import React, { FunctionComponent } from "react";
-import { useCells } from "../stream";
+import { useCells } from "../store";
 import { Cell } from "./index";
 import { range } from "lodash";
 
 import { styles, row } from "./board.css";
+import { useBoard } from "../hooks/board.hook";
 
 export const Board: FunctionComponent = () => {
-  const width = 10;
-  const height = 10;
+  const { width, height } = useBoard();
   const cells = useCells();
 
   console.log(cells);

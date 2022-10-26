@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { borderStyles } from "../../common";
-import { useGameStats } from "../../stream";
+import { useGameStats } from "../../store";
 
 import { FlagIcon } from "../../assets";
 

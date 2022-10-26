@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
-import { FlagIcon } from "../../assets";
-import { onFlagCell, onOpenCell, useCell } from "../../stream";
+import { BombIcon, FlagIcon } from "../../assets";
+import { onFlagCell, onOpenCell, useCell } from "../../store";
 import { CidType } from "../../types";
 import { CellState } from "../../utils";
 
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const Cell: FunctionComponent<Props> = ({ id }: Props) => {
-  const { around, state } = useCell(id);
+  const { around, state, isMine } = useCell(id);
 
   return (
     <div
@@ -25,8 +25,11 @@ export const Cell: FunctionComponent<Props> = ({ id }: Props) => {
         onFlagCell(id);
       }}
     >
-      {state === CellState.Opened && around}
+      {state === CellState.Opened && !isMine && !!around && (
+        <span>{around}</span>
+      )}
       {state === CellState.Flagged && <FlagIcon />}
+      {state === CellState.Opened && isMine && <BombIcon />}
     </div>
   );
 };
